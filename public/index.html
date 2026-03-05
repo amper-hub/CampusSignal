@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusSignal - Issue Tracker</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <!-- Auth Container: Register & Login forms -->
+    <div id="authContainer" class="container">
+        <div class="auth-box">
+            <h1>CampusSignal</h1>
+            <p class="subtitle">Campus Issue Tracker</p>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="form-section">
+                <h2>Create Account</h2>
+                <form id="registerFormElement">
+                    <div class="form-group">
+                        <label for="registerEmail">Email:</label>
+                        <input type="email" id="registerEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="registerPassword">Password:</label>
+                        <input type="password" id="registerPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                </form>
+                <p class="form-toggle">
+                    Already have an account? 
+                    <a href="#" onclick="toggleAuthForms(); return false;">Login</a>
+                </p>
+            </div>
+
+            <!-- Login Form (hidden by default) -->
+            <div id="loginForm" class="form-section hidden">
+                <h2>Login</h2>
+                <form id="loginFormElement">
+                    <div class="form-group">
+                        <label for="loginEmail">Email:</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password:</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                </form>
+                <p class="form-toggle">
+                    Don't have an account? 
+                    <a href="#" onclick="toggleAuthForms(); return false;">Register</a>
+                </p>
+            </div>
+
+            <!-- Error message display -->
+            <div id="authError" class="error-message hidden"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard Container: After login -->
+    <div id="dashboardContainer" class="container hidden">
+        <!-- Header with logout -->
+        <div class="dashboard-header">
+            <h1>CampusSignal Dashboard</h1>
+            <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+        </div>
+
+        <!-- Issue Submission Form -->
+        <div class="form-card">
+            <h2>Report an Issue</h2>
+            <form id="issueFormElement">
+                <div class="form-group">
+                    <label for="issueCategory">Category:</label>
+                    <select id="issueCategory" required>
+                        <option value="">Select Category</option>
+                        <option value="maintenance">Maintenance</option>
+                        <option value="facility">Facility</option>
+                        <option value="safety">Safety</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="issueBuilding">Building:</label>
+                    <input type="text" id="issueBuilding" placeholder="e.g., Building A" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="issueRoom">Room:</label>
+                    <input type="text" id="issueRoom" placeholder="e.g., 301" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="issueDescription">Description:</label>
+                    <textarea id="issueDescription" rows="4" placeholder="Describe the issue..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="issueImage">Image (optional):</label>
+                    <input type="file" id="issueImage" accept="image/*">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit Issue</button>
+            </form>
+            <div id="issueError" class="error-message hidden"></div>
+            <div id="issueSuccess" class="success-message hidden"></div>
+        </div>
+
+        <!-- Issues List -->
+        <div class="issues-container">
+            <h2>All Issues</h2>
+            <div id="issuesList" class="issues-list">
+                <p class="loading">Loading issues...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for viewing issue details and suggestions -->
+    <div id="issueModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeIssueModal()">&times;</span>
+            <div id="issueModalBody">
+                <!-- Issue details and suggestions will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/script.js"></script>
+</body>
+</html>

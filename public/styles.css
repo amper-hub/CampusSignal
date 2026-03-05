@@ -1,0 +1,532 @@
+/* ========================================
+   RESET & GLOBAL STYLES
+   ======================================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #333;
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* ========================================
+   CONTAINER & LAYOUT
+   ======================================== */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ========================================
+   AUTHENTICATION SECTION
+   ======================================== */
+#authContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.auth-box {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+}
+
+.auth-box h1 {
+    font-size: 32px;
+    margin-bottom: 5px;
+    color: #667eea;
+    text-align: center;
+}
+
+.subtitle {
+    text-align: center;
+    color: #999;
+    margin-bottom: 30px;
+    font-size: 14px;
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+.form-section h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* ========================================
+   FORM STYLES
+   ======================================== */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+    font-size: 14px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="file"],
+select,
+textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="file"]:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* ========================================
+   BUTTON STYLES
+   ======================================== */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+}
+
+.btn-primary {
+    background: #667eea;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-secondary {
+    background: #999;
+    color: white;
+    width: auto;
+}
+
+.btn-secondary:hover {
+    background: #777;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+    width: auto;
+    display: inline-block;
+}
+
+.btn-vote {
+    margin-right: 10px;
+    width: auto;
+}
+
+.btn-vote.agree {
+    background: #27ae60;
+    color: white;
+}
+
+.btn-vote.agree:hover {
+    background: #229954;
+}
+
+.btn-vote.disagree {
+    background: #e74c3c;
+    color: white;
+}
+
+.btn-vote.disagree:hover {
+    background: #c0392b;
+}
+
+/* ========================================
+   MESSAGE STYLES
+   ======================================== */
+.error-message {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 12px;
+    border-radius: 5px;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.success-message {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+    padding: 12px;
+    border-radius: 5px;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+/* ========================================
+   FORM TOGGLE LINK
+   ======================================== */
+.form-toggle {
+    text-align: center;
+    font-size: 14px;
+    color: #666;
+    margin-top: 15px;
+}
+
+.form-toggle a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.form-toggle a:hover {
+    text-decoration: underline;
+}
+
+/* ========================================
+   DASHBOARD STYLES
+   ======================================== */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h1 {
+    color: #333;
+    margin: 0;
+}
+
+/* ========================================
+   CARD STYLES
+   ======================================== */
+.form-card {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+.form-card h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* ========================================
+   ISSUES LIST STYLES
+   ======================================== */
+.issues-container {
+    margin-top: 30px;
+}
+
+.issues-container h2 {
+    color: white;
+    margin-bottom: 20px;
+    font-size: 24px;
+}
+
+.issues-list {
+    display: grid;
+    gap: 15px;
+}
+
+.issue-card {
+    background: white;
+    border-left: 4px solid #667eea;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.issue-card:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+.issue-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.issue-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.issue-status {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.status-open {
+    background: #e8f5e9;
+    color: #27ae60;
+}
+
+.status-in-progress {
+    background: #fff3e0;
+    color: #f39c12;
+}
+
+.status-resolved {
+    background: #e3f2fd;
+    color: #3498db;
+}
+
+.issue-meta {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.issue-meta span {
+    margin-right: 15px;
+}
+
+.issue-meta strong {
+    color: #333;
+}
+
+.issue-description {
+    color: #555;
+    margin-bottom: 15px;
+    line-height: 1.5;
+}
+
+.issue-image-thumb {
+    max-width: 100%;
+    max-height: 150px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.issue-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.vote-count {
+    font-size: 12px;
+    color: #666;
+    padding: 0 5px;
+}
+
+/* ========================================
+   SUGGESTIONS SECTION
+   ======================================== */
+.suggestions-section {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+}
+
+.suggestions-section h4 {
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 14px;
+}
+
+.suggestion-item {
+    background: #f9f9f9;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    border-left: 3px solid #667eea;
+}
+
+.suggestion-item strong {
+    color: #667eea;
+}
+
+.no-suggestions {
+    color: #999;
+    font-size: 13px;
+    font-style: italic;
+}
+
+/* ========================================
+   MODAL STYLES
+   ======================================== */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* ========================================
+   UTILITY CLASSES
+   ======================================== */
+.loading {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    font-style: italic;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .auth-box {
+        padding: 25px;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .dashboard-header h1 {
+        text-align: center;
+    }
+
+    .dashboard-header .btn {
+        width: 100%;
+    }
+
+    .issue-header {
+        flex-direction: column;
+    }
+
+    .btn-vote {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .issue-actions {
+        flex-direction: column;
+    }
+
+    .btn-vote.agree,
+    .btn-vote.disagree {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-box {
+        padding: 20px;
+    }
+
+    .auth-box h1 {
+        font-size: 24px;
+    }
+
+    .form-card {
+        padding: 15px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 20px;
+    }
+
+    .issue-card {
+        padding: 15px;
+    }
+
+    .issue-title {
+        font-size: 16px;
+    }
+}
