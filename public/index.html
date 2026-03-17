@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSignal Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">CampusSignal</div>
+      <div class="auth" id="authContainer">
+        <div class="auth-signed-out" id="authSignedOut">
+          <input type="email" id="loginEmail" placeholder="email" />
+          <input type="password" id="loginPassword" placeholder="password" />
+          <button id="loginBtn">Log in</button>
+          <button id="registerBtn" class="secondary">Register</button>
+        </div>
+        <div class="auth-signed-in hidden" id="authSignedIn">
+          <span id="meLabel"></span>
+          <button id="logoutBtn" class="secondary">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="grid" id="dashboard">
+      <section class="card" id="reportCard">
+        <h2>Report Issue</h2>
+
+        <form id="reportForm">
+          <div class="form-row">
+            <input type="text" id="issueCategory" placeholder="Category" />
+            <input type="text" id="issueBuilding" placeholder="Building" />
+          </div>
+          <div class="form-row">
+            <input type="text" id="issueRoom" placeholder="Room" />
+          </div>
+          <div class="form-row">
+            <textarea id="issueDescription" placeholder="Describe the issue..." rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <label class="file-upload">
+              <span>Upload image (optional)</span>
+              <input type="file" id="issueImage" accept="image/*" />
+            </label>
+          </div>
+          <button type="submit" class="primary" id="submitReportBtn">Submit Issue</button>
+          <div class="info" id="reportStatus"></div>
+        </form>
+      </section>
+
+      <section class="card" id="suggestionCard">
+        <h2>Submit Suggestion</h2>
+
+        <form id="suggestionForm">
+          <div class="form-row">
+            <textarea id="suggestionText" placeholder="Share a suggestion..." rows="3"></textarea>
+          </div>
+          <div class="form-row">
+            <label class="file-upload">
+              <span>Upload image (optional)</span>
+              <input type="file" id="suggestionImage" accept="image/*" />
+            </label>
+          </div>
+          <button type="submit" class="primary" id="submitSuggestionBtn">Submit Suggestion</button>
+          <div class="info" id="suggestionStatus"></div>
+        </form>
+      </section>
+
+      <section class="card" id="issuesFeed">
+        <header class="card-header">
+          <h2>Issues Feed</h2>
+          <button id="refreshIssues" class="secondary">Refresh</button>
+        </header>
+        <div id="issuesList" class="feed"></div>
+      </section>
+
+      <section class="card" id="suggestionsFeed">
+        <header class="card-header">
+          <h2>Suggestions Feed</h2>
+          <button id="refreshSuggestions" class="secondary">Refresh</button>
+        </header>
+        <div id="suggestionsList" class="feed"></div>
+      </section>
+
+      <section class="card" id="myReports">
+        <h2>My Reports</h2>
+        <div id="myReportsList" class="feed"></div>
+      </section>
+
+      <section class="card" id="activity">
+        <h2>Activity</h2>
+        <div id="activityLog" class="feed"></div>
+      </section>
+    </main>
+
+    <script src="script.js" defer></script>
+  </body>
+</html>
