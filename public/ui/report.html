@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSignal | Report</title>
+    <link rel="stylesheet" href="/ui/theme.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">CampusSignal</div>
+      <nav class="nav">
+        <a href="/ui/home.html">Home</a>
+        <a class="active" href="/ui/report.html">Make a Report</a>
+        <a href="/ui/profile.html">Profile</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+    <main class="container grid" style="grid-template-columns: 1fr 1fr">
+      <section class="card">
+        <h2>Report Issue</h2>
+        <form id="issueForm">
+          <div class="field"><label>Title</label><input id="issueTitle" required /></div>
+          <div class="field"><label>Description</label><textarea id="issueDescription" required></textarea></div>
+          <div class="field"><label>Upload Image</label><input id="issueImage" type="file" accept="image/*" /></div>
+          <button class="btn-primary" type="submit">Submit Issue</button>
+          <p id="issueMessage"></p>
+        </form>
+      </section>
+      <section class="card">
+        <h2>Submit Suggestion</h2>
+        <form id="suggestionForm">
+          <div class="field"><label>Title</label><input id="suggestionTitle" required /></div>
+          <div class="field"><label>Description</label><textarea id="suggestionDescription" required></textarea></div>
+          <div class="field"><label>Upload Image</label><input id="suggestionImage" type="file" accept="image/*" /></div>
+          <button class="btn-primary" type="submit">Submit Suggestion</button>
+          <p id="suggestionMessage"></p>
+        </form>
+      </section>
+    </main>
+
+    <script src="/api.js"></script>
+    <script src="/ui/app.js"></script>
+    <script>
+      if (!requireAuth()) {
+      }
+
+      document.getElementById("issueForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const msg = document.getElementById("issueMessage");
+        msg.className = "";
+        try {
+          const form = new FormData();
+          form.append("title", document.getElementById("issueTitle").value);
+          form.append("description", document.getElementById("issueDescription").value);
+          const image = document.getElementById("issueImage").files[0];
+          if (image) {
+            form.append("file", image);
+          }
+          await API.issues.create(form);
+          msg.className = "success-text";
+          msg.textContent = "Issue submitted successfully.";
+          event.target.reset();
+        } catch (error) {
+          msg.className = "error-text";
+          msg.textContent = error.message || "Failed to submit issue";
+        }
+      });
+
+      document.getElementById("suggestionForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const msg = document.getElementById("suggestionMessage");
+        msg.className = "";
+        try {
+          const form = new FormData();
+          form.append("title", document.getElementById("suggestionTitle").value);
+          form.append("description", document.getElementById("suggestionDescription").value);
+          const image = document.getElementById("suggestionImage").files[0];
+          if (image) {
+            form.append("file", image);
+          }
+          await API.suggestions.create(form);
+          msg.className = "success-text";
+          msg.textContent = "Suggestion submitted successfully.";
+          event.target.reset();
+        } catch (error) {
+          msg.className = "error-text";
+          msg.textContent = error.message || "Failed to submit suggestion";
+        }
+      });
+    </script>
+  </body>
+</html>

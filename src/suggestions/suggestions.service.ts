@@ -1,4 +1,9 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Suggestion } from '../entities/suggestion.entity';
@@ -32,10 +37,17 @@ export class SuggestionsService {
     imageUrl?: string;
     userId: number;
   }) {
+    if (!data.userId) {
+      throw new BadRequestException('Authenticated user is required');
+    }
+    if (!data.description || !data.description.trim()) {
+      throw new BadRequestException('Description is required');
+    }
+
     const suggestion = this.suggestionRepo.create({
       issueId: data.issueId,
       title: data.title,
-      description: data.description,
+      description: data.description.trim(),
       imageUrl: data.imageUrl,
       userId: data.userId,
     });
@@ -54,15 +66,23 @@ export class SuggestionsService {
     return this.suggestionRepo.save(suggestion);
   }
 
-  async delete(id: number, userId: number) {
+  async delete(
+    id: number,
+    currentUser: { id: number; role?: { name?: string } | string },
+  ) {
     const suggestion = await this.suggestionRepo.findOne({ where: { id } });
     if (!suggestion) {
       throw new NotFoundException('Suggestion not found');
     }
-    if (suggestion.userId !== userId) {
-      throw new ForbiddenException('Can only delete own suggestions');
+    const roleName =
+      typeof currentUser?.role === 'string'
+        ? currentUser.role
+        : currentUser?.role?.name;
+    const isAdmin = roleName === 'admin';
+    if (suggestion.userId !== currentUser?.id && !isAdmin) {
+      throw new ForbiddenException('You cannot delete this post');
     }
     await this.suggestionRepo.remove(suggestion);
-    return { message: 'Suggestion deleted' };
+    return { message: 'Suggestion deleted successfully' };
   }
 }

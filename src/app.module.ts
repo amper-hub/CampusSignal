@@ -10,6 +10,8 @@ import { IssuesModule } from './issues/issues.module';
 import { VotesModule } from './votes/votes.module';
 import { SuggestionsModule } from './suggestions/suggestions.module';
 import { UploadsModule } from './uploads/uploads.module';
+import { CommentsModule } from './comments/comments.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -28,8 +30,7 @@ import { UploadsModule } from './uploads/uploads.module';
     // configure TypeORM using async factory so we can pull from ConfigService
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => {
-        // validate presence of required vars to avoid obscure runtime errors
+      useFactory: (configService: ConfigService) => {
         const host = configService.get<string>('DB_HOST');
         const port = parseInt(configService.get<string>('DB_PORT') ?? '3306', 10);
         const username = configService.get<string>('DB_USER');
@@ -41,8 +42,12 @@ import { UploadsModule } from './uploads/uploads.module';
           );
         }
         return {
-          type: 'sqlite',
-          database: 'campussignal.db',
+          type: 'mysql' as const,
+          host,
+          port,
+          username,
+          password: password || '',
+          database,
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: true, // don't enable in production!
         };
@@ -56,6 +61,8 @@ import { UploadsModule } from './uploads/uploads.module';
     VotesModule,
     SuggestionsModule,
     UploadsModule,
+    CommentsModule,
+    AdminModule,
   ],
   controllers: [AppController],
 })

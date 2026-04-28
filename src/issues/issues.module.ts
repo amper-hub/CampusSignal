@@ -5,9 +5,10 @@ import { IssuesController } from './issues.controller';
 import { Issue } from '../entities/issue.entity';
 import { Vote } from '../entities/vote.entity';
 import { Suggestion } from '../entities/suggestion.entity';
+import { UploadsModule } from '../uploads/uploads.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Issue, Vote, Suggestion])],
+  imports: [TypeOrmModule.forFeature([Issue, Vote, Suggestion]), UploadsModule],
   providers: [IssuesService],
   controllers: [IssuesController],
 })

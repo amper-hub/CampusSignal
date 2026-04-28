@@ -18,20 +18,75 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { id: Number(id) } });
   }
 
+  async findByIdWithRole(id: number): Promise<User | null> {
+    return this.usersRepository.findOne({
+      where: { id },
+      relations: ['role'],
+    });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { email }, relations: ['role'] });
   }
 
   async create(data: Partial<User>): Promise<User> {
+    // If no roleId specified, default to 'user' role (roleId = 1)
+    // Ensure user role exists in database
+    let roleId = data.roleId;
+    
+    if (!roleId) {
+      // Default to user role
+      roleId = 1;
+      console.log('[USERS] No roleId provided, defaulting to user role (ID: 1)');
+    }
+
     const user = this.usersRepository.create({
       ...data,
-      roleId: data.roleId || 1, // Default to user role
+      roleId,
     });
+
     const saved = await this.usersRepository.save(user);
-    const fullUser = await this.usersRepository.findOne({ where: { id: saved.id }, relations: ['role'] });
+    
+    // Reload user with role relation to ensure it's populated
+    const fullUser = await this.usersRepository.findOne({
+      where: { id: saved.id },
+      relations: ['role'],
+    });
+
     if (!fullUser) {
       throw new Error('Failed to create user');
     }
+
+    console.log('[USERS] User created successfully:', {
+      id: fullUser.id,
+      email: fullUser.email,
+      roleId: fullUser.roleId,
+      role: fullUser.role?.name,
+    });
+
     return fullUser;
+  }
+
+  async getProfile(userId: number) {
+    const user = await this.usersRepository.findOne({
+      where: { id: userId },
+      relations: ['role', 'issues', 'suggestions'],
+      order: {
+        issues: { createdAt: 'DESC' },
+        suggestions: { createdAt: 'DESC' },
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    return {
+      id: user.id,
+      email: user.email,
+      role: user.role?.name ?? 'user',
+      issues: user.issues ?? [],
+      suggestions: user.suggestions ?? [],
+    };
   }
 }

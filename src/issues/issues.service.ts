@@ -1,4 +1,9 @@
-import { Injectable, ForbiddenException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  ForbiddenException,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Issue } from '../entities/issue.entity';
@@ -73,12 +78,19 @@ export class IssuesService {
     imageUrl?: string;
     userId: number;
   }) {
+    if (!data.userId) {
+      throw new BadRequestException('Authenticated user is required');
+    }
+    if (!data.description || !data.description.trim()) {
+      throw new BadRequestException('Description is required');
+    }
+
     const issue = this.issueRepo.create({
       title: data.title || data.category || 'Issue',
       category: data.category,
       building: data.building,
       room: data.room,
-      description: data.description,
+      description: data.description.trim(),
       imageUrl: data.imageUrl,
       userId: data.userId,
     });
@@ -98,18 +110,26 @@ export class IssuesService {
     return this.issueRepo.save(issue);
   }
 
-  async delete(id: number, userId: number) {
-    const issue = await this.issueRepo.findOne({ where: { id }, relations: ['user', 'user.role'] });
+  async delete(
+    id: number,
+    currentUser: { id: number; role?: { name?: string } | string },
+  ) {
+    const issue = await this.issueRepo.findOne({ where: { id } });
     if (!issue) {
       throw new NotFoundException('Issue not found');
     }
-    if (issue.userId !== userId && issue.user.role?.name !== 'admin') {
-      throw new ForbiddenException('Can only delete own issues or be admin');
+    const roleName =
+      typeof currentUser?.role === 'string'
+        ? currentUser.role
+        : currentUser?.role?.name;
+    const isAdmin = roleName === 'admin';
+    if (issue.userId !== currentUser?.id && !isAdmin) {
+      throw new ForbiddenException('You cannot delete this post');
     }
     // Cascade delete votes and suggestions
     await this.voteRepo.delete({ issueId: id });
     await this.suggestionRepo.delete({ issueId: id });
     await this.issueRepo.remove(issue);
-    return { message: 'Issue deleted' };
+    return { message: 'Issue deleted successfully' };
   }
 }

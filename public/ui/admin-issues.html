@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSignal | Admin Issues</title>
+    <link rel="stylesheet" href="/ui/theme.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">CampusSignal Admin</div>
+      <nav class="nav">
+        <a href="/ui/admin-dashboard.html">Dashboard</a>
+        <a class="active" href="/ui/admin-issues.html">Issues</a>
+        <a href="/ui/admin-suggestions.html">Suggestions</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+    <main class="container">
+      <section class="card">
+        <h2>All Issues</h2>
+        <div id="issues"></div>
+      </section>
+    </main>
+
+    <script src="/api.js"></script>
+    <script src="/ui/app.js"></script>
+    <script>
+      async function submitFeedback(issueId) {
+        const feedback = document.getElementById(`feedback-${issueId}`).value.trim();
+        const status = document.getElementById(`status-${issueId}`).value;
+        if (!feedback) {
+          return;
+        }
+        await API.admin.provideFeedbackOnIssue(issueId, { feedback, status });
+        await loadIssues();
+      }
+
+      async function deleteIssue(issueId) {
+        const ok = window.confirm("Delete this issue?");
+        if (!ok) {
+          return;
+        }
+        try {
+          await API.admin.deleteIssue(issueId);
+          await loadIssues();
+        } catch (error) {
+          alert(error.message || "Failed to delete issue");
+        }
+      }
+
+      async function loadIssues() {
+        if (!requireAuth() || !requireAdmin()) {
+          return;
+        }
+        const items = await API.admin.getAllIssues();
+        const html = items
+          .map(
+            (issue) => `
+            <article class="card post">
+              <div class="row">
+                <div>
+                  <h3>${issue.title || "Untitled"}</h3>
+                  <p class="muted">By ${issue.user?.email || "Unknown"} • ${new Date(issue.createdAt).toLocaleString()}</p>
+                </div>
+                <strong>${statusLabel(issue.status)}</strong>
+              </div>
+              <p>${issue.description || ""}</p>
+              ${issue.imageUrl ? `<img class="preview" src="${issue.imageUrl}" alt="Issue image" />` : ""}
+              ${issue.hasAdminFeedback ? `<div class="feedback">${issue.adminFeedback || ""}</div>` : ""}
+              <div class="grid" style="grid-template-columns: 1fr 180px 130px">
+                <textarea id="feedback-${issue.id}" placeholder="Write feedback...">${issue.adminFeedback || ""}</textarea>
+                <select id="status-${issue.id}">
+                  <option value="open" ${issue.status === "open" ? "selected" : ""}>Pending</option>
+                  <option value="reviewed" ${issue.status === "reviewed" ? "selected" : ""}>Reviewed</option>
+                  <option value="resolved" ${issue.status === "resolved" ? "selected" : ""}>Resolved</option>
+                </select>
+                <div class="row">
+                  <button class="btn-primary" onclick="submitFeedback(${issue.id})">Save</button>
+                  <button class="btn-secondary" onclick="deleteIssue(${issue.id})">Delete</button>
+                </div>
+              </div>
+            </article>
+          `,
+          )
+          .join("");
+        document.getElementById("issues").innerHTML = html || "<p class='muted'>No issues found.</p>";
+      }
+
+      loadIssues().catch((error) => {
+        document.getElementById("issues").innerHTML = `<p class="error-text">${error.message || "Unable to load issues"}</p>`;
+      });
+    </script>
+  </body>
+</html>

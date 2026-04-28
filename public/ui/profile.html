@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSignal | Profile</title>
+    <link rel="stylesheet" href="/ui/theme.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">CampusSignal</div>
+      <nav class="nav">
+        <a href="/ui/home.html">Home</a>
+        <a href="/ui/report.html">Make a Report</a>
+        <a class="active" href="/ui/profile.html">Profile</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+    <main class="container grid">
+      <section class="card">
+        <h2>My Profile</h2>
+        <p>Email: <strong id="email">-</strong></p>
+        <p>Role: <strong id="role">-</strong></p>
+      </section>
+      <section class="card">
+        <h2>My Reports</h2>
+        <div id="issues"></div>
+      </section>
+      <section class="card">
+        <h2>My Suggestions</h2>
+        <div id="suggestions"></div>
+      </section>
+    </main>
+    <script src="/api.js"></script>
+    <script src="/ui/app.js"></script>
+    <script>
+      function renderList(items) {
+        if (!items.length) {
+          return "<p class='muted'>No entries yet.</p>";
+        }
+        return items
+          .map(
+            (item) => `
+            <article class="post">
+              <h3>${item.title || "Untitled"}</h3>
+              <p class="muted">${new Date(item.createdAt).toLocaleDateString()}${item.status ? ` • ${statusLabel(item.status)}` : ""}</p>
+              <p>${item.description || ""}</p>
+              ${item.hasAdminFeedback ? `<div class="feedback">${item.adminFeedback || "Feedback available"}</div>` : ""}
+            </article>
+          `,
+          )
+          .join("");
+      }
+
+      async function initProfile() {
+        if (!requireAuth()) {
+          return;
+        }
+        const profile = await API.users.getProfile();
+        document.getElementById("email").textContent = profile.email;
+        document.getElementById("role").textContent = profile.role || profile.role?.name || "user";
+        document.getElementById("issues").innerHTML = renderList(profile.issues || []);
+        document.getElementById("suggestions").innerHTML = renderList(profile.suggestions || []);
+      }
+
+      initProfile().catch((error) => {
+        document.getElementById("issues").innerHTML = `<p class="error-text">${error.message || "Unable to load profile"}</p>`;
+        document.getElementById("suggestions").innerHTML = "";
+      });
+    </script>
+  </body>
+</html>

@@ -1,6 +1,18 @@
-import { Controller, Get, Post, Body, Query, UseGuards, Request, Param, Patch, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Request,
+  Param,
+  Patch,
+  Delete,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { SuggestionsService } from './suggestions.service';
 import { UploadsService } from '../uploads/uploads.service';
 
@@ -23,17 +35,20 @@ export class SuggestionsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post()
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(
+    FileFieldsInterceptor([{ name: 'image', maxCount: 1 }, { name: 'file', maxCount: 1 }]),
+  )
   async create(
+    @UploadedFiles() files: { image?: any[]; file?: any[] },
     @Body() body: any,
     @Request() req: any,
-    @UploadedFile() file: any,
   ) {
     const userId = req.user?.id;
+    const pickedFile = files?.image?.[0] ?? files?.file?.[0];
     let imageUrl = '';
-    if (file) {
-      const uploadResult = await this.uploadsService.upload(file);
-      imageUrl = uploadResult.url;
+    if (pickedFile) {
+      const uploadResult = await this.uploadsService.upload(pickedFile);
+      imageUrl = uploadResult.url || '';
     }
     return this.suggestionsService.create({
       issueId: body.issueId ? Number(body.issueId) : undefined,
@@ -58,7 +73,6 @@ export class SuggestionsController {
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
   async delete(@Param('id') id: string, @Request() req: any) {
-    const userId = req.user?.id;
-    return this.suggestionsService.delete(Number(id), userId);
+    return this.suggestionsService.delete(Number(id), req.user);
   }
 }

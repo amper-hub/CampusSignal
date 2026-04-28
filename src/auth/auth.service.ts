@@ -29,15 +29,36 @@ export class AuthService {
 
   async login(body: LoginDto) {
     const { email, password } = body;
-    const user = await this.validateUser(email, password);
+    
+    // Find user with role relation
+    const user = await this.usersService.findByEmail(email);
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    // Verify password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     const payload = { sub: user.id, email: user.email };
+    const roleString = user.role?.name ?? 'user';
+    
+    console.log('[AUTH] Login successful:', {
+      userId: user.id,
+      email: user.email,
+      role: roleString,
+      roleId: user.roleId,
+    });
+
     return {
       access_token: this.jwtService.sign(payload),
-      user: { id: user.id, email: user.email, role: user.role?.name },
+      user: {
+        id: user.id,
+        email: user.email,
+        role: roleString, // Always a string
+      },
     };
   }
 
@@ -48,15 +69,35 @@ export class AuthService {
     }
 
     const hashed = await bcrypt.hash(body.password, 10);
+    
+    // Create user with default 'user' role
     const newUser = await this.usersService.create({
       email: body.email,
       password: hashed,
     });
 
-    const payload = { sub: newUser.id, email: newUser.email };
+    // Ensure role is loaded
+    const fullUser = await this.usersService.findByEmail(newUser.email);
+    if (!fullUser || !fullUser.role) {
+      throw new Error('Failed to assign user role');
+    }
+
+    const payload = { sub: fullUser.id, email: fullUser.email };
+    const roleString = fullUser.role.name;
+
+    console.log('[AUTH] Registration successful:', {
+      userId: fullUser.id,
+      email: fullUser.email,
+      role: roleString,
+    });
+
     return {
       access_token: this.jwtService.sign(payload),
-      user: { id: newUser.id, email: newUser.email, role: newUser.role?.name },
+      user: {
+        id: fullUser.id,
+        email: fullUser.email,
+        role: roleString, // Always a string
+      },
     };
   }
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSignal | Admin Dashboard</title>
+    <link rel="stylesheet" href="/ui/theme.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">CampusSignal Admin</div>
+      <nav class="nav">
+        <a class="active" href="/ui/admin-dashboard.html">Dashboard</a>
+        <a href="/ui/admin-issues.html">Issues</a>
+        <a href="/ui/admin-suggestions.html">Suggestions</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+    <main class="container">
+      <section class="grid stats-grid" id="stats"></section>
+    </main>
+    <script src="/api.js"></script>
+    <script src="/ui/app.js"></script>
+    <script>
+      async function loadDashboard() {
+        if (!requireAuth() || !requireAdmin()) {
+          return;
+        }
+        const summary = await API.admin.getReportSummary();
+        const cards = [
+          ["Total Issues", summary.totalIssues],
+          ["Total Suggestions", summary.totalSuggestions],
+          ["Total Users", summary.totalUsers],
+          ["Issues With Feedback", summary.issuesWithFeedback],
+          ["Pending Issues", summary.pendingIssues],
+        ];
+        document.getElementById("stats").innerHTML = cards
+          .map(
+            ([label, value]) => `
+            <article class="card stat-card">
+              <h3>${label}</h3>
+              <p>${value}</p>
+            </article>
+          `,
+          )
+          .join("");
+      }
+
+      loadDashboard().catch((error) => {
+        document.getElementById("stats").innerHTML = `<p class='error-text'>${error.message || "Unable to load dashboard"}</p>`;
+      });
+    </script>
+  </body>
+</html>

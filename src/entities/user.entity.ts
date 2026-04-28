@@ -11,6 +11,7 @@ import { Role } from './role.entity';
 import { Issue } from './issue.entity';
 import { Suggestion } from './suggestion.entity';
 import { Vote } from './vote.entity';
+import { Comment } from './comment.entity';
 
 @Entity()
 export class User {
@@ -39,4 +40,7 @@ export class User {
 
   @OneToMany(() => Vote, vote => vote.user)
   votes: Vote[];
+
+  @OneToMany(() => Comment, comment => comment.user)
+  comments: Comment[];
 }

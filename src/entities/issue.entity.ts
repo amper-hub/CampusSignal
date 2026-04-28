@@ -11,6 +11,7 @@ import {
 import { User } from './user.entity';
 import { Vote } from './vote.entity';
 import { Suggestion } from './suggestion.entity';
+import { Comment } from './comment.entity';
 
 @Entity()
 export class Issue {
@@ -38,9 +39,18 @@ export class Issue {
   @Column({ nullable: true })
   imageUrl: string;
 
+  @Column({ default: false })
+  hasAdminFeedback: boolean;
+
+  @Column({ nullable: true, length: 5000 })
+  adminFeedback?: string;
+
   @Index()
   @Column()
   userId: number;
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   @ManyToOne(() => User, user => user.issues, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
@@ -49,9 +59,9 @@ export class Issue {
   @OneToMany(() => Vote, vote => vote.issue)
   votes: Vote[];
 
+  @OneToMany(() => Comment, comment => comment.issue)
+  comments: Comment[];
+
   @OneToMany(() => Suggestion, suggestion => suggestion.issue)
   suggestions: Suggestion[];
-
-  @CreateDateColumn()
-  createdAt: Date;
 }
