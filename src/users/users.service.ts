@@ -30,14 +30,13 @@ export class UsersService {
   }
 
   async create(data: Partial<User>): Promise<User> {
-    // If no roleId specified, default to 'user' role (roleId = 1)
+    // If no roleId specified, default to 'user' role (roleId = 2).
     // Ensure user role exists in database
     let roleId = data.roleId;
     
     if (!roleId) {
-      // Default to user role
-      roleId = 1;
-      console.log('[USERS] No roleId provided, defaulting to user role (ID: 1)');
+      roleId = 2;
+      console.log('[USERS] No roleId provided, defaulting to user role (ID: 2)');
     }
 
     const user = this.usersRepository.create({
@@ -84,7 +83,8 @@ export class UsersService {
     return {
       id: user.id,
       email: user.email,
-      role: user.role?.name ?? 'user',
+      roleId: user.roleId,
+      role: user.roleId === 1 ? 'admin' : 'user',
       issues: user.issues ?? [],
       suggestions: user.suggestions ?? [],
     };

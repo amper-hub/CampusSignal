@@ -13,6 +13,7 @@ function getUser() {
 function clearSession() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("roleId");
   localStorage.removeItem("role");
 }
 
@@ -31,8 +32,8 @@ function requireAuth() {
 
 function requireAdmin() {
   const user = getUser();
-  const role = localStorage.getItem("role") || user?.role;
-  if (role !== "admin") {
+  const roleId = parseInt(localStorage.getItem("roleId") || user?.roleId, 10);
+  if (roleId !== 1) {
     window.location.href = "/ui/home.html";
     return false;
   }

@@ -19,6 +19,10 @@ import { Roles } from '../auth/roles.decorator';
 export class AdminController {
   constructor(private adminService: AdminService) {}
 
+  private getRoleName(user: any): string {
+    return user?.roleId === 1 ? 'admin' : (user?.role?.name || 'user');
+  }
+
   @Get('issues')
   async getIssues(@Request() req: any) {
     return this.adminService.getAllIssues();
@@ -35,7 +39,7 @@ export class AdminController {
     @Body() dto: { feedback: string; status?: string },
     @Request() req: any,
   ) {
-    const userRole = req.user.role?.name || 'user';
+    const userRole = this.getRoleName(req.user);
     return this.adminService.provideFeedbackOnIssue(
       Number(issueId),
       dto,
@@ -49,7 +53,7 @@ export class AdminController {
     @Body() dto: { feedback: string },
     @Request() req: any,
   ) {
-    const userRole = req.user.role?.name || 'user';
+    const userRole = this.getRoleName(req.user);
     return this.adminService.provideFeedbackOnSuggestion(
       Number(suggestionId),
       dto,
@@ -59,13 +63,13 @@ export class AdminController {
 
   @Get('reports/summary')
   async getReportSummary(@Request() req: any) {
-    const userRole = req.user.role?.name || 'user';
+    const userRole = this.getRoleName(req.user);
     return this.adminService.getReportSummary(userRole);
   }
 
   @Delete('issues/:id')
   async deleteIssue(@Param('id') issueId: string, @Request() req: any) {
-    const userRole = req.user.role?.name || 'user';
+    const userRole = this.getRoleName(req.user);
     return this.adminService.deleteIssue(Number(issueId), userRole);
   }
 
@@ -74,7 +78,7 @@ export class AdminController {
     @Param('id') suggestionId: string,
     @Request() req: any,
   ) {
-    const userRole = req.user.role?.name || 'user';
+    const userRole = this.getRoleName(req.user);
     return this.adminService.deleteSuggestion(Number(suggestionId), userRole);
   }
 }

@@ -43,7 +43,8 @@ export class AuthService {
     }
 
     const payload = { sub: user.id, email: user.email };
-    const roleString = user.role?.name ?? 'user';
+    const roleId = user.roleId;
+    const roleString = roleId === 1 ? 'admin' : 'user';
     
     console.log('[AUTH] Login successful:', {
       userId: user.id,
@@ -57,7 +58,8 @@ export class AuthService {
       user: {
         id: user.id,
         email: user.email,
-        role: roleString, // Always a string
+        roleId,
+        role: roleString,
       },
     };
   }
@@ -83,7 +85,8 @@ export class AuthService {
     }
 
     const payload = { sub: fullUser.id, email: fullUser.email };
-    const roleString = fullUser.role.name;
+    const roleId = fullUser.roleId;
+    const roleString = roleId === 1 ? 'admin' : 'user';
 
     console.log('[AUTH] Registration successful:', {
       userId: fullUser.id,
@@ -96,7 +99,8 @@ export class AuthService {
       user: {
         id: fullUser.id,
         email: fullUser.email,
-        role: roleString, // Always a string
+        roleId,
+        role: roleString,
       },
     };
   }

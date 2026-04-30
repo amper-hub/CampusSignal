@@ -68,7 +68,11 @@ export class SuggestionsService {
 
   async delete(
     id: number,
-    currentUser: { id: number; role?: { name?: string } | string },
+    currentUser: {
+      id: number;
+      roleId?: number;
+      role?: { name?: string } | string;
+    },
   ) {
     const suggestion = await this.suggestionRepo.findOne({ where: { id } });
     if (!suggestion) {
@@ -78,7 +82,7 @@ export class SuggestionsService {
       typeof currentUser?.role === 'string'
         ? currentUser.role
         : currentUser?.role?.name;
-    const isAdmin = roleName === 'admin';
+    const isAdmin = currentUser?.roleId === 1 || roleName === 'admin';
     if (suggestion.userId !== currentUser?.id && !isAdmin) {
       throw new ForbiddenException('You cannot delete this post');
     }

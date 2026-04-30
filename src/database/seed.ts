@@ -18,31 +18,14 @@ async function bootstrap() {
   try {
     console.log('[SEED] Starting database seed...');
 
-    // Seed roles
-    const roles = ['user', 'admin'];
-    for (const roleName of roles) {
-      const exists = await roleRepository.findOne({
-        where: { name: roleName },
-      });
-
-      if (!exists) {
-        const role = roleRepository.create({ name: roleName });
-        await roleRepository.save(role);
-        console.log(`[SEED] Created role: ${roleName}`);
-      } else {
-        console.log(`[SEED] Role already exists: ${roleName}`);
-      }
-    }
-
-    // Get role IDs
-    const userRole = await roleRepository.findOne({ where: { name: 'user' } });
-    const adminRole = await roleRepository.findOne({ where: { name: 'admin' } });
-
-    if (!userRole || !adminRole) {
-      throw new Error('Failed to find or create roles');
-    }
-
-    console.log(`[SEED] User role ID: ${userRole.id}, Admin role ID: ${adminRole.id}`);
+    // Seed role IDs used by the frontend/backend contract.
+    await roleRepository.query(
+      "INSERT IGNORE INTO `role` (`id`, `name`) VALUES (1, 'admin')",
+    );
+    await roleRepository.query(
+      "INSERT IGNORE INTO `role` (`id`, `name`) VALUES (2, 'user')",
+    );
+    console.log('[SEED] Role IDs ready: admin = 1, user = 2');
 
     // Seed admin user if not exists
     const adminEmail = 'admin@gmail.com';
@@ -55,15 +38,15 @@ async function bootstrap() {
       const admin = userRepository.create({
         email: adminEmail,
         password: hashedPassword,
-        roleId: adminRole.id,
+        roleId: 1,
       });
       await userRepository.save(admin);
       console.log(`[SEED] Created admin user: ${adminEmail}`);
     } else {
       console.log(`[SEED] Admin user already exists: ${adminEmail}`);
       // Ensure admin has admin role
-      if (existingAdmin.roleId !== adminRole.id) {
-        existingAdmin.roleId = adminRole.id;
+      if (existingAdmin.roleId !== 1) {
+        existingAdmin.roleId = 1;
         await userRepository.save(existingAdmin);
         console.log(`[SEED] Updated admin user role`);
       }

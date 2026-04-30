@@ -9,33 +9,32 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const dataSource = app.get(DataSource);
 
-  // Ensure baseline roles exist.
+  // Ensure baseline role IDs exist: 1 = admin, 2 = user.
   const roleRepo = dataSource.getRepository(Role);
-  let userRole = await roleRepo.findOne({ where: { name: 'user' } });
-  if (!userRole) {
-    userRole = await roleRepo.save({ name: 'user' });
-  }
-  let adminRole = await roleRepo.findOne({ where: { name: 'admin' } });
-  if (!adminRole) {
-    adminRole = await roleRepo.save({ name: 'admin' });
-  }
+  await roleRepo.query(
+    "INSERT IGNORE INTO `role` (`id`, `name`) VALUES (1, 'admin')",
+  );
+  await roleRepo.query(
+    "INSERT IGNORE INTO `role` (`id`, `name`) VALUES (2, 'user')",
+  );
 
-  // Reset users and seed required default admin.
+  // Seed or fix the required default admin.
   const userRepo = dataSource.getRepository(User);
-  await userRepo
-    .createQueryBuilder()
-    .delete()
-    .from(User)
-    .where('1=1')
-    .execute();
-  const adminPassword = await bcrypt.hash('Admin123', 10);
-  await userRepo.save(
-    userRepo.create({
+  const adminEmail = 'admin@gmail.com';
+  const existingAdmin = await userRepo.findOne({ where: { email: adminEmail } });
+  if (existingAdmin) {
+    if (existingAdmin.roleId !== 1) {
+      existingAdmin.roleId = 1;
+      await userRepo.save(existingAdmin);
+    }
+  } else {
+    const adminPassword = await bcrypt.hash('Admin123', 10);
+    await userRepo.save(userRepo.create({
       email: 'admin@gmail.com',
       password: adminPassword,
-      roleId: adminRole.id,
-    }),
-  );
+      roleId: 1,
+    }));
+  }
 
   await app.listen(process.env.PORT ?? 3000);
 }
