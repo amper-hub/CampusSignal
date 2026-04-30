@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSignal | Home</title>
+    <link rel="stylesheet" href="/ui/theme.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">CampusSignal</div>
+      <nav class="nav">
+        <a class="active" href="/ui/home.html">Home</a>
+        <a href="/ui/report.html">Make a Report</a>
+        <a href="/ui/profile.html">Profile</a>
+        <a href="#" id="adminLink" style="display: none">Admin</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+
+    <main class="container">
+      <div class="card">
+        <h2>Community Feed</h2>
+        <div id="feed"></div>
+      </div>
+    </main>
+
+    <script src="/api.js"></script>
+    <script src="/ui/app.js"></script>
+    <script>
+      function canDeletePost(post, user) {
+        if (!user) {
+          return false;
+        }
+        const isAdmin = parseInt(localStorage.getItem("roleId") || user.roleId, 10) === 1;
+        return isAdmin || user.id === post.userId;
+      }
+
+      function renderPost(post) {
+        const user = getUser();
+        const showDelete = canDeletePost(post, user);
+        const statusClass = post.hasAdminFeedback ? "dot-green" : "dot-red";
+        return `
+          <article class="post card">
+            <div class="row">
+              <div>
+                <h3>${post.title || "Untitled"}</h3>
+                <p class="muted">By ${post.user?.email || "Unknown"} • ${new Date(post.createdAt).toLocaleString()}</p>
+              </div>
+              <div title="${post.hasAdminFeedback ? "Has admin feedback" : "No admin feedback"}">
+                <span class="status-dot ${statusClass}"></span>
+              </div>
+            </div>
+            <p>${post.description || ""}</p>
+            ${post.imageUrl ? `<img class="preview" src="${post.imageUrl}" alt="Report image" />` : ""}
+            ${showDelete ? `<div class="row"><button class="btn-secondary" onclick="deletePost('${post.type}', ${post.id})">Delete</button></div>` : ""}
+            ${post.hasAdminFeedback ? `<div class="feedback"><strong>Admin Feedback:</strong> ${post.adminFeedback || "Feedback added"}</div>` : ""}
+            <div class="comment-box" id="comments-${post.type}-${post.id}">
+              <p class="muted">Loading comments...</p>
+            </div>
+          </article>
+        `;
+      }
+
+      async function deletePost(postType, postId) {
+        const ok = window.confirm("Delete this post?");
+        if (!ok) {
+          return;
+        }
+        try {
+          if (postType === "issue") {
+            await API.issues.delete(postId);
+          } else {
+            await API.suggestions.delete(postId);
+          }
+          await loadFeed();
+        } catch (error) {
+          alert(error.message || "Failed to delete post");
+        }
+      }
+
+      async function loadComments(postId, postType) {
+        const comments = postType === "issue" ? await API.comments.listByIssue(postId) : await API.comments.listBySuggestion(postId);
+        const wrapper = document.getElementById(`comments-${postType}-${postId}`);
+        wrapper.innerHTML = `
+          <p class="muted">${comments.length} comments</p>
+          ${comments.map((c) => `<div class="comment-item"><strong>${c.user?.email || "Unknown"}:</strong> ${c.content}</div>`).join("")}
+          <div class="row">
+            <input id="input-${postType}-${postId}" type="text" placeholder="Add a comment..." />
+            <button class="btn-secondary" onclick="addComment(${postId}, '${postType}')">Post</button>
+          </div>
+        `;
+      }
+
+      async function addComment(postId, postType) {
+        const input = document.getElementById(`input-${postType}-${postId}`);
+        const value = input.value.trim();
+        if (!value) {
+          return;
+        }
+        if (postType === "issue") {
+          await API.comments.create(value, postId, undefined);
+        } else {
+          await API.comments.create(value, undefined, postId);
+        }
+        input.value = "";
+        await loadComments(postId, postType);
+      }
+
+      async function loadFeed() {
+        if (!requireAuth()) {
+          return;
+        }
+        const feedEl = document.getElementById("feed");
+        feedEl.innerHTML = "<p class='muted'>Loading...</p>";
+        try {
+          const [issues, suggestions] = await Promise.all([API.issues.list(), API.suggestions.list()]);
+          const allPosts = [...issues.map((i) => ({ ...i, type: "issue" })), ...suggestions.map((s) => ({ ...s, type: "suggestion" }))].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+          );
+          if (!allPosts.length) {
+            feedEl.innerHTML = "<p class='muted'>No posts yet.</p>";
+            return;
+          }
+          feedEl.innerHTML = allPosts.map(renderPost).join("");
+          for (const post of allPosts) {
+            await loadComments(post.id, post.type);
+          }
+        } catch (error) {
+          feedEl.innerHTML = `<p class='error-text'>${error.message || "Failed to load feed"}</p>`;
+        }
+      }
+
+      const currentUser = getUser();
+      if (parseInt(localStorage.getItem("roleId") || currentUser?.roleId, 10) === 1) {
+        const adminLink = document.getElementById("adminLink");
+        adminLink.style.display = "inline-block";
+        adminLink.href = "/ui/admin-dashboard.html";
+      }
+
+      loadFeed();
+    </script>
+  </body>
+</html>

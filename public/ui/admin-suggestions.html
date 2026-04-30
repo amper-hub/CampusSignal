@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSignal | Admin Suggestions</title>
+    <link rel="stylesheet" href="/ui/theme.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">CampusSignal Admin</div>
+      <nav class="nav">
+        <a href="/ui/admin-dashboard.html">Dashboard</a>
+        <a href="/ui/admin-issues.html">Issues</a>
+        <a class="active" href="/ui/admin-suggestions.html">Suggestions</a>
+        <a href="#" onclick="logout()">Logout</a>
+      </nav>
+    </header>
+    <main class="container">
+      <section class="card">
+        <h2>All Suggestions</h2>
+        <div id="suggestions"></div>
+      </section>
+    </main>
+
+    <script src="/api.js"></script>
+    <script src="/ui/app.js"></script>
+    <script>
+      async function submitFeedback(suggestionId) {
+        const feedback = document.getElementById(`feedback-${suggestionId}`).value.trim();
+        if (!feedback) {
+          return;
+        }
+        await API.admin.provideFeedbackOnSuggestion(suggestionId, { feedback });
+        await loadSuggestions();
+      }
+
+      async function deleteSuggestion(suggestionId) {
+        const ok = window.confirm("Delete this suggestion?");
+        if (!ok) {
+          return;
+        }
+        try {
+          await API.admin.deleteSuggestion(suggestionId);
+          await loadSuggestions();
+        } catch (error) {
+          alert(error.message || "Failed to delete suggestion");
+        }
+      }
+
+      async function loadSuggestions() {
+        if (!requireAuth() || !requireAdmin()) {
+          return;
+        }
+        const items = await API.admin.getAllSuggestions();
+        document.getElementById("suggestions").innerHTML =
+          items
+            .map(
+              (suggestion) => `
+              <article class="card post">
+                <h3>${suggestion.title || "Untitled"}</h3>
+                <p class="muted">By ${suggestion.user?.email || "Unknown"} • ${new Date(suggestion.createdAt).toLocaleString()}</p>
+                <p>${suggestion.description || ""}</p>
+                ${suggestion.imageUrl ? `<img class="preview" src="${suggestion.imageUrl}" alt="Suggestion image" />` : ""}
+                ${suggestion.hasAdminFeedback ? `<div class="feedback">${suggestion.adminFeedback || ""}</div>` : ""}
+                <div class="row">
+                  <textarea id="feedback-${suggestion.id}" placeholder="Write feedback...">${suggestion.adminFeedback || ""}</textarea>
+                  <div class="row">
+                    <button class="btn-primary" onclick="submitFeedback(${suggestion.id})">Save</button>
+                    <button class="btn-secondary" onclick="deleteSuggestion(${suggestion.id})">Delete</button>
+                  </div>
+                </div>
+              </article>
+            `,
+            )
+            .join("") || "<p class='muted'>No suggestions found.</p>";
+      }
+
+      loadSuggestions().catch((error) => {
+        document.getElementById("suggestions").innerHTML = `<p class="error-text">${error.message || "Unable to load suggestions"}</p>`;
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,76 @@
+ITE 325 — Assignment 3: AI Code Quality Audit + Refactoring Plan
+
+1) Target Area
+
+Files chosen:
+- src/auth/auth.controller.ts
+- src/auth/auth.service.ts
+
+What does this part of the app do? This module manages user authentication processes, including login and registration, by validating credentials, hashing passwords, and issuing JWT tokens for secure API access.
+
+2) Short Research Notes
+
+- Refactoring is the process of improving code structure and readability without altering its external behavior.
+- Refactoring differs from adding features because it focuses on code quality improvements rather than introducing new functionality.
+- Code smells common in AI-generated code: long methods that handle multiple responsibilities.
+- Code smells common in AI-generated code: duplicated code blocks across functions.
+- Code smells common in AI-generated code: unclear or generic variable names.
+- Techniques to refactor safely: run automated tests after each small change.
+- Techniques to refactor safely: use version control to commit incremental changes.
+
+3) Code Quality Audit
+
+Finding 1:
+- What is the issue? The register method throws an UnauthorizedException for email conflicts instead of a more appropriate BadRequestException.
+- Why is it a problem long-term? It misleads API consumers about the error type, complicating client-side error handling.
+- Where is it? auth.service.ts, register method (around line 45).
+
+Finding 2:
+- What is the issue? The bcrypt salt rounds are hardcoded as 10 in the register method.
+- Why is it a problem long-term? It prevents easy configuration of security settings for different environments.
+- Where is it? auth.service.ts, register method (around line 42).
+
+Finding 3:
+- What is the issue? Token generation logic is duplicated between login and register methods.
+- Why is it a problem long-term? It violates DRY principles, making updates error-prone and maintenance harder.
+- Where is it? auth.service.ts, login and register methods (around lines 30-35 and 50-55).
+
+Finding 4:
+- What is the issue? The validateUser method returns an 'any' type instead of a proper interface.
+- Why is it a problem long-term? It reduces type safety, increasing the risk of runtime errors and hindering IDE support.
+- Where is it? auth.service.ts, validateUser method (around line 15).
+
+Finding 5:
+- What is the issue? There is no logging in authentication methods for successful or failed attempts.
+- Why is it a problem long-term? It makes debugging production issues and monitoring security events difficult.
+- Where is it? auth.service.ts, throughout login, register, and validateUser methods.
+
+4) Safe Refactoring Plan
+
+Step 1 (small change): Change UnauthorizedException to BadRequestException in the register method for email conflicts.
+Verification: Run `npm run start:dev` and test registration with an existing email via Postman to confirm 400 status.
+Commit message: "Change exception type for email registration conflict to BadRequestException"
+
+Step 2 (small change): Extract duplicated token generation into a private method called generateToken.
+Verification: Run `npm run test` to ensure login and register still return valid tokens.
+Commit message: "Extract token generation logic into private method to reduce duplication"
+
+Step 3 (small change): Replace 'any' return type in validateUser with a proper User interface.
+Verification: Run `npm run build` to check for TypeScript compilation errors.
+Commit message: "Add proper typing to validateUser method return type"
+
+Step 4 (small change): Add basic logging for authentication attempts using NestJS Logger.
+Verification: Start the app with `npm run start:dev` and check console logs during login/register.
+Commit message: "Add logging for authentication success and failure events"
+
+Step 5 (small change): Make bcrypt salt rounds configurable via environment variable.
+Verification: Set SALT_ROUNDS=12 in .env and test registration to ensure hashing works.
+Commit message: "Make bcrypt salt rounds configurable for better security management"
+
+Step 6 (small change): Add input trimming to email fields in DTOs to prevent whitespace issues.
+Verification: Use curl `curl -X POST http://localhost:3000/auth/register -H "Content-Type: application/json" -d '{"email":" test@example.com ","password":"pass"}'` and verify trimmed email.
+Commit message: "Add email trimming in DTOs to handle input whitespace"
+
+5) Reflection
+
+AI is good at quickly generating repetitive boilerplate code like basic CRUD operations in frameworks such as NestJS. However, AI is bad at deeply understanding nuanced business requirements and edge cases that require human judgment. A human engineer must always be responsible for thoroughly testing code, ensuring security, and validating that the implementation aligns with project goals. "Owning the problem" means taking full accountability for the code's design, performance, and long-term maintainability, rather than relying on automated tools to handle complex decisions. This includes anticipating future changes and ensuring the solution is robust and scalable. Ultimately, while AI can assist, human oversight is crucial for delivering reliable software.

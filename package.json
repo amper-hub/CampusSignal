@@ -17,14 +17,27 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+<<<<<<< HEAD
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
+=======
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "seed": "ts-node -r tsconfig-paths src/database/seed.ts"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.3",
+>>>>>>> docs/specs
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.14",
+<<<<<<< HEAD
+=======
+    "@nestjs/serve-static": "^5.0.4",
+>>>>>>> docs/specs
     "@nestjs/typeorm": "^11.0.0",
     "bcrypt": "^6.0.0",
     "class-transformer": "^0.5.1",

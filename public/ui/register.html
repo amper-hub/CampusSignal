@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusSignal | Register</title>
+    <link rel="stylesheet" href="/ui/theme.css" />
+  </head>
+  <body>
+    <main class="auth-layout">
+      <section class="auth-hero">
+        <div class="logo">CampusSignal</div>
+        <p class="tagline">Create your account and help improve campus life.</p>
+      </section>
+      <section class="auth-form-wrap">
+        <div class="panel">
+          <h1>Sign up</h1>
+          <form id="registerForm">
+            <div class="field">
+              <label for="email">Email</label>
+              <input id="email" type="email" required />
+            </div>
+            <div class="field">
+              <label for="password">Password</label>
+              <input id="password" type="password" required />
+            </div>
+            <div class="field">
+              <label for="confirmPassword">Confirm Password</label>
+              <input id="confirmPassword" type="password" required />
+            </div>
+            <button class="btn-primary" type="submit">Create Account</button>
+            <p id="error" class="error-text"></p>
+          </form>
+          <p class="muted">Already a member? <a class="link" href="/ui/login.html">Sign in</a></p>
+        </div>
+      </section>
+    </main>
+
+    <script src="/api.js"></script>
+    <script>
+      document.getElementById("registerForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const errorEl = document.getElementById("error");
+        errorEl.textContent = "";
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        if (password !== confirmPassword) {
+          errorEl.textContent = "Passwords do not match";
+          return;
+        }
+        try {
+          await API.auth.register(document.getElementById("email").value, password);
+          window.location.href = "/ui/login.html";
+        } catch (error) {
+          errorEl.textContent = error.message || "Registration failed";
+        }
+      });
+    </script>
+  </body>
+</html>
