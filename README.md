@@ -24,53 +24,53 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+# CampusSignal
 
-## Project setup
+CampusSignal is a full-stack web application built with NestJS, TypeORM,
+MySQL, and a custom HTML/CSS/JavaScript UI.\
+It allows users to report campus issues, submit suggestions, and
+interact through comments, while admins manage content.
 
-```bash
-$ npm install
-```
+## Features
 
-## Compile and run the project
+-   JWT Authentication
+-   Role-based access (Admin/User)
+-   Issue & Suggestion posting with images
+-   Comments system
+-   Admin dashboard
+-   Profile page
 
-```bash
-# development
-$ npm run start
+## Setup Instructions
 
-# watch mode
-$ npm run start:dev
+### 1. Clone Repository
 
-# production mode
-$ npm run start:prod
-```
+git clone https://github.com/amper-hub/CampusSignal.git cd CampusSignal
 
-## Run tests
+### 2. Install Dependencies
 
-```bash
-# unit tests
-$ npm run test
+npm install
 
-# e2e tests
-$ npm run test:e2e
+### 3. Setup Database
 
-# test coverage
-$ npm run test:cov
-```
+Run in MySQL: CREATE DATABASE campussignal;
 
-## Deployment
+### 4. Create .env file
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+DB_HOST=localhost DB_PORT=3306 DB_USER=root DB_PASS=
+DB_NAME=campussignal JWT_SECRET=your_secret
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 5. Run Project
 
-```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
-```
+npm run start:dev
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 6. Open
 
+http://localhost:3000
+
+## Admin Account
+
+Email: admin@gmail.com\
+Password: Admin123
 ## Resources
 
 Check out a few resources that may come in handy when working with NestJS:
